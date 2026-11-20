@@ -1,26 +1,871 @@
 @import "tailwindcss";
 
+/*
+  BenRed — sistema visual "Plano y escena"
+  Paleta derivada del degradado del logo (#026472 → #64BDAF) + tinta + papel de plano.
+  El naranja "señal" solo marca acciones y cotas, nunca decora.
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --paper: #f3f0e9;
+  --paper-2: #e9e5db;
+  --ink: #0d1517;
+  --ink-2: #1a2427;
+  --teal-deep: #026472;
+  --teal: #258288;
+  --mint: #64bdaf;
+  --signal: #ff5a2b;
+  --line: rgb(13 21 23 / 0.16);
+  --line-strong: rgb(13 21 23 / 0.45);
+  --muted: #4a5659;
+
+  /* Motion — única fuente de duraciones, easings y distancias (ver lib/motion.ts) */
+  --m-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --m-ease-io: cubic-bezier(0.5, 0, 0.2, 1);
+  --m-dur-s: 0.3s;
+  --m-dur-m: 0.7s;
+  --m-dur-l: 1.1s;
+  --m-dist: 18px;
+  --m-dist-s: 10px;
+  --m-stagger: 70ms;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-teal-deep: var(--teal-deep);
+  --color-teal: var(--teal);
+  --color-mint: var(--mint);
+  --color-signal: var(--signal);
+  --color-muted: var(--muted);
+  --font-display: var(--font-display);
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+
+::selection {
+  background: var(--teal-deep);
+  color: var(--paper);
+}
+
+/* Papel de plano: grilla fina + marcas de módulo */
+.grid-paper {
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-position: -1px -1px;
+}
+.grid-paper-dark {
+  background-image:
+    linear-gradient(rgb(243 240 233 / 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(243 240 233 / 0.09) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.font-display {
+  font-family: var(--font-display), system-ui, sans-serif;
+  letter-spacing: -0.035em;
+}
+
+.label {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Foco visible consistente */
+:focus-visible {
+  outline: 3px solid var(--signal);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Botones */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 3.25rem;
+  padding: 0 1.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  border: 1.5px solid var(--ink);
+  transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn-primary {
+  background: var(--signal);
+  border-color: var(--signal);
+  color: var(--ink);
+}
+.btn-primary:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+.btn-ghost:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+.btn-ghost-light {
+  border-color: var(--paper);
+  color: var(--paper);
+}
+.btn-ghost-light:hover {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* ---------- Entradas scroll-triggered (clase is-in la pone el gestor de scroll) ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(var(--m-dist));
+  transition: opacity var(--m-dur-m) var(--m-ease), transform var(--m-dur-m) var(--m-ease);
+  transition-delay: var(--d, 0ms);
+}
+.reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+.reveal-fade {
+  opacity: 0;
+  transition: opacity var(--m-dur-m) var(--m-ease);
+  transition-delay: var(--d, 0ms);
+}
+.reveal-fade.is-in {
+  opacity: 1;
+}
+
+/* Grupo editorial: hijos en cascada + líneas que se extienden */
+.reveal-group .rg-item {
+  opacity: 0;
+  transform: translateY(var(--m-dist-s));
+  transition: opacity var(--m-dur-m) var(--m-ease), transform var(--m-dur-m) var(--m-ease);
+  transition-delay: calc(var(--d, 0ms) + var(--k, 0) * var(--m-stagger));
+}
+.reveal-group .rg-rule {
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--m-dur-l) var(--m-ease-io);
+  transition-delay: var(--d, 0ms);
+}
+.reveal-group.is-in .rg-item {
+  opacity: 1;
+  transform: none;
+}
+.reveal-group.is-in .rg-rule {
+  transform: none;
+}
+
+/* Titulares por palabra: máscara con holgura para no cortar ascendentes/descendentes */
+.rw {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding: 0.1em 0.04em 0.14em;
+  margin: -0.1em -0.04em -0.14em;
+}
+.rw-i {
+  display: inline-block;
+  transform: translateY(105%);
+  transition: transform var(--m-dur-l) var(--m-ease);
+  transition-delay: calc(var(--k, 0) * 45ms);
+}
+.reveal-words.is-in .rw-i {
+  transform: none;
+}
+
+/* ---------- Tarjetas de portafolio: revelado + paralaje interno ---------- */
+.card-reveal {
+  opacity: 0;
+  clip-path: inset(0 0 9% 0);
+  transition: opacity var(--m-dur-m) var(--m-ease), clip-path var(--m-dur-l) var(--m-ease);
+}
+.card-reveal.is-in {
+  opacity: 1;
+  clip-path: inset(0);
+}
+.card-tag {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity var(--m-dur-m) var(--m-ease) 0.25s, transform var(--m-dur-m) var(--m-ease) 0.25s,
+    background-color var(--m-dur-s) ease, color var(--m-dur-s) ease;
+}
+.card-reveal.is-in .card-tag {
+  opacity: 1;
+  transform: none;
+}
+/* ±2,5 % de recorrido sobre una imagen ampliada 6 %: no se recorta información relevante */
+.parallax-img {
+  transform: translate3d(0, calc((var(--p, 0.5) - 0.5) * -5%), 0) scale(1.06);
+}
+@media (hover: hover) {
+  .card-reveal:hover .card-tag {
+    background: var(--paper);
+    color: var(--ink);
+    border-color: var(--paper);
+  }
+}
+
+/* ---------- Proceso: etapas ligadas al scroll (--p lo escribe el gestor) ---------- */
+.step {
+  --gain: 1.6;
+  --off: 0;
+  --a: clamp(0, calc(var(--p, 1) * var(--gain) - var(--i, 0) * var(--off)), 1);
+}
+@media (min-width: 1024px) {
+  .step {
+    --gain: 2;
+    --off: 0.3;
+  }
+}
+.step::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--teal-deep);
+  transform: scaleY(var(--a));
+  transform-origin: top;
+}
+.step-n {
+  display: inline-block;
+  transform: translateX(calc(var(--a) * 6px));
+}
+.step-title,
+.step-desc {
+  opacity: calc(0.62 + var(--a) * 0.38);
+}
+.step-title {
+  transform: translateY(calc((1 - var(--a)) * 6px));
+}
+
+/* ---------- Microinteracciones ---------- */
+.btn [aria-hidden="true"] {
+  display: inline-block;
+  transition: transform var(--m-dur-s) var(--m-ease);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+@media (hover: hover) {
+  .btn:hover [aria-hidden="true"] {
+    transform: translateX(5px);
+  }
+}
+.btn:focus-visible [aria-hidden="true"] {
+  transform: translateX(5px);
+}
+.hover-underline[aria-current="page"] {
+  background-size: 100% 1.5px;
+}
+.row-n {
+  transition: color var(--m-dur-s) ease;
+}
+.group:hover .row-n,
+.group:focus-visible .row-n {
+  color: var(--signal);
+}
+.row-arrow {
+  transition: transform var(--m-dur-s) var(--m-ease);
+}
+.group:hover .row-arrow,
+.group:focus-visible .row-arrow {
+  transform: translateX(10px);
+}
+
+/* ---------- Hero: secuencia plano 2D → stand 3D (fases en data-phase, ver lib/hero-sequence.ts) ----------
+   Trazado con stroke-dashoffset (pathLength=1): 1 = oculto, 0 = dibujado.
+   Dibujo: retraso --d y duración --dd (por elemento). Borrado: retraso --e, 0,65 s (inverso del trazado). */
+.hs {
+  --sk: 1; /* factor de grosor: mayor en móvil para conservar legibilidad */
+}
+.hs .st {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  stroke-width: calc(var(--w, 1.6) * var(--sk) * 1px);
+  transition: stroke-dashoffset 0.65s cubic-bezier(0.4, 0, 0.6, 1) var(--e, 0s), opacity 0.3s ease calc(var(--e, 0s) + 0.35s);
+}
+.hs .fl {
+  opacity: 0;
+  transition: opacity 0.3s ease var(--e, 0s);
+}
+.hs .tx {
+  opacity: 0;
+  transition: opacity 0.25s ease 0s;
+}
+.hs .st.fl {
+  transition: stroke-dashoffset 0.65s cubic-bezier(0.4, 0, 0.6, 1) var(--e, 0s), opacity 0.3s ease calc(var(--e, 0s) + 0.35s);
+}
+
+/* Visible: plano en draw2d/hold2d; volumen en draw3d/hold3d */
+.hs:is([data-phase="draw2d"], [data-phase="hold2d"]) .v2 .st,
+.hs:is([data-phase="draw3d"], [data-phase="hold3d"], [data-phase="materialize"], [data-phase="holdReal"]) .v3 .st {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset var(--dd, 0.6s) var(--m-ease-io) var(--d, 0s), opacity 0.25s ease var(--d, 0s);
+}
+.hs:is([data-phase="draw2d"], [data-phase="hold2d"]) .v2 .fl,
+.hs:is([data-phase="draw3d"], [data-phase="hold3d"], [data-phase="materialize"], [data-phase="holdReal"]) .v3 .fl {
+  opacity: 1;
+  transition: opacity 0.35s ease var(--d, 0s);
+}
+.hs:is([data-phase="draw2d"], [data-phase="hold2d"]) .v2 .tx,
+.hs:is([data-phase="draw3d"], [data-phase="hold3d"], [data-phase="materialize"], [data-phase="holdReal"]) .v3 .tx {
+  opacity: 1;
+  transition: opacity 0.4s ease var(--d, 0s);
+}
+
+
+/* Materiales: capa C sobre la misma geometría. Aparecen escalonados (--m) en MATERIALIZE y el trazo
+   del wireframe se atenúa (no desaparece). Se ocultan rápido al hacer RESET. */
+.hs .mt {
+  opacity: 0;
+  transition: opacity 0.3s ease var(--e, 0s);
+}
+.hs:is([data-phase="materialize"], [data-phase="holdReal"]) .v3 .mt {
+  opacity: 1;
+  transition: opacity 0.6s ease var(--m, 0s);
+}
+.hs .st.wf {
+  transition: stroke-dashoffset 0.65s cubic-bezier(0.4, 0, 0.6, 1) var(--e, 0s), opacity 0.3s ease calc(var(--e, 0s) + 0.35s),
+    stroke-opacity 0.3s ease;
+}
+.hs:is([data-phase="materialize"], [data-phase="holdReal"]) .v3 .st.wf {
+  stroke-opacity: 0.5;
+  transition: stroke-opacity 1.4s ease 0.3s;
+}
+
+/* Personas (hero): aparecen en HOLD_REAL, escalonadas (--m), con una entrada corta sobre el plano del
+   suelo (eje x isométrico). No hay animación continua: quedan quietas y ancladas por su sombra. */
+.hs .pp {
+  opacity: 0;
+  transform: translate(-9px, -5px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.hs[data-phase="holdReal"] .v3 .pp {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.6s ease var(--m, 0s), transform 0.8s var(--m-ease) var(--m, 0s);
+}
+
+/* Idle (antes de empezar / al salir del hero): lienzo vacío, sin transiciones → reinicio limpio */
+.hs[data-phase="idle"] *,
+.hs[data-phase="idle"] *::before {
+  transition: none !important;
+}
+
+@media (max-width: 640px) {
+  .hs {
+    --sk: 1.5;
+  }
+  .hs .minor {
+    display: none;
+  }
+  .hs .lbl {
+    font-size: 17px;
+  }
+  .hs .br-t {
+    display: none; /* el nombre de marca sería ilegible a este tamaño; se conserva el isotipo */
+  }
+}
+
+/* En móvil: versión simplificada (sin escalonado largo, desplazamientos menores) */
+@media (max-width: 767px) {
+  .reveal {
+    transform: translateY(10px);
+  }
+  .reveal-group .rg-item {
+    transform: none;
+    transition-delay: calc(var(--d, 0ms) + var(--k, 0) * 40ms);
+  }
+  .rw-i {
+    transition-delay: calc(var(--k, 0) * 30ms);
+  }
+}
+
+/* Marquee de línea de tiempo del proceso */
+.hover-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1.5px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.3s ease;
+}
+.hover-underline:hover,
+.group:hover .hover-underline {
+  background-size: 100% 1.5px;
+}
+
+
+/* ---------- "Del plano al piso de feria": segundo stand, ligado al scroll ----------
+   El progreso lo aplica StandScroll (src/components/StandScroll.tsx) solo a los elementos que cambian.
+   Este CSS define el ESTADO ESTÁTICO = stand terminado (sin JS o con movimiento reducido):
+   el plano 2D se oculta y el volumen se muestra completo. Con JS se añade `.live` al <svg>. */
+.stand-track {
+  --stand-extra: 65vh;
+  position: relative;
+}
+.stand-stage {
+  position: sticky;
+  top: 88px;
+}
+.stand-frame {
+  height: min(calc(100svh - 190px), 720px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.stand-frame svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.stand-spacer {
+  height: var(--stand-extra);
+}
+.stand-cap {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line-strong);
+}
+.stand-phases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+.stand-phases .label {
+  color: var(--signal);
+}
+.stand-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1px;
+  height: 2px;
+  background: var(--mint);
+  transform-origin: left center;
+}
+.ps {
+  --sk: 1;
+}
+.ps:not(.live) .v2 {
+  display: none;
+}
+.ps .st {
+  stroke-dasharray: 1 2;
+  stroke-linecap: butt;
+  stroke-width: calc(var(--w, 1.6) * var(--sk) * 1px);
+}
+.ps .wfg {
+  stroke-opacity: 0.5;
+}
+
+@media (max-width: 767px) {
+  .stand-track {
+    --stand-extra: 45vh;
+  }
+  .stand-stage {
+    top: 80px;
+  }
+  .stand-frame {
+    height: auto;
+    overflow: hidden;
+    justify-content: flex-start;
+  }
+  .stand-frame svg {
+    height: auto;
+    /* sin leyenda (oculta en móvil) el dibujo ocupa ~81 % del ancho: se amplía y se recorta lo vacío */
+    width: 123%;
+    max-width: none;
+    flex: none;
+  }
+  .ps {
+    --sk: 2;
+  }
+  .ps .lg,
+  .ps .minor,
+  .ps .ctx,
+  .ps .br-t {
+    display: none; /* textos de marca/leyenda ilegibles a este tamaño; se conservan isotipos y personas */
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stand-spacer {
+    height: 0;
+  }
+  .stand-stage {
+    position: static;
+  }
+}
+
+
+/* ---------- "De la idea al escenario": concierto conceptual, ligado al scroll ----------
+   El progreso lo aplica ConcertScroll solo a lo que cambia. Este CSS define el ESTADO ESTÁTICO =
+   concierto terminado, de noche (sin JS o con movimiento reducido). Con JS se añade `.live`. */
+.cs-track {
+  --cs-extra: 90vh; /* = CONCERT_EXTRA_VH.desktop */
+  position: relative;
+}
+.cs-stage {
+  position: sticky;
+  top: 88px;
+}
+.cs-frame {
+  height: min(calc(100svh - 190px), 700px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cs-frame svg {
+  display: block;
+  aspect-ratio: 800 / 520;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  border: 1px solid rgb(100 189 175 / 0.35);
+  background: var(--ink);
+  color: #6fd0d4;
+}
+.cs-spacer {
+  height: var(--cs-extra);
+}
+.cs-cap {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgb(243 240 233 / 0.28);
+  color: var(--paper);
+}
+.cs-cap .label.text-muted {
+  color: rgb(243 240 233 / 0.72);
+}
+.cs-phases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+.cs-phases .label {
+  color: var(--signal);
+}
+.cs-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1px;
+  height: 2px;
+  background: var(--mint);
+  transform-origin: left center;
+}
+.cs:not(.live) .ann {
+  display: none;
+}
+.cs .st {
+  fill: none;
+  stroke: currentColor;
+  stroke-linejoin: miter;
+  stroke-dasharray: 1 2;
+  stroke-linecap: butt;
+  stroke-width: 1.3px;
+}
+.cs .struct .st {
+  stroke-opacity: 0.8;
+}
+@media (max-width: 767px) {
+  .cs-track {
+    --cs-extra: 70vh; /* = CONCERT_EXTRA_VH.mobile */
+  }
+  .cs-stage {
+    top: 80px;
+  }
+  .cs-frame {
+    height: auto;
+  }
+  .cs-frame svg {
+    width: 100%;
+    max-height: none;
+  }
+  .cs .minor {
+    display: none;
+  }
+  .cs .tx {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-spacer {
+    height: 0;
+  }
+  .cs-stage {
+    position: static;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hs .v3 .st {
+    stroke-dashoffset: 0;
+    transition: none;
+  }
+  .hs .v3 .fl,
+  .hs .v3 .tx,
+  .hs .v3 .mt {
+    opacity: 1;
+    transition: none;
+  }
+  .hs .v3 .st.wf {
+    stroke-opacity: 0.5;
+  }
+  .hs .v3 .pp {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .reveal,
+  .reveal-fade,
+  .reveal-group .rg-item,
+  .rw-i,
+  .card-reveal,
+  .card-tag {
+    opacity: 1;
+    transform: none;
+    clip-path: none;
+    transition: none;
+  }
+  .reveal-group .rg-rule {
+    transform: none;
+    transition: none;
+  }
+  .parallax-img {
+    transform: scale(1.06);
+  }
+  .step {
+    --a: 1;
+  }
+  .step-n,
+  .step-title {
+    transform: none;
+  }
+  .btn [aria-hidden="true"],
+  .row-arrow {
+    transition: none;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- Laboratorio creativo (servicios): diagramas técnicos conceptuales ---------- */
+.lab-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.lab .ln {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+}
+.lab .ln-t { stroke: var(--teal-deep); }
+.lab .ln-s { stroke: var(--signal); }
+.lab .ln-faint { stroke: rgb(13 21 23 / 0.3); stroke-width: 1; }
+.lab .fl-m { fill: rgb(100 189 175 / 0.22); }
+.lab .fl-p { fill: var(--paper); }
+.lab .fl-w { fill: var(--paper-2); }
+.lab .fl-w2 { fill: #d9d4c7; }
+.lab .fl-ink { fill: var(--ink); stroke: none; }
+.lab .fl-s { fill: var(--signal); stroke: none; }
+.lab .fl-mint { fill: var(--mint); stroke: none; }
+.lab .t {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  fill: var(--ink);
+}
+.lab .t-s { font-size: 11.5px; fill: var(--muted); }
+.lab .t-s2 { font-size: 10px; }
+.lab .t-inv { fill: var(--paper); }
+
+/* trazado al entrar en vista (lo dispara la clase is-in del Reveal que envuelve el diagrama) */
+.lab-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset var(--m-dur-l) var(--m-ease-io);
+  transition-delay: calc(var(--k, 0) * 120ms);
+}
+.is-in .lab-draw,
+.lab-flow.is-in .lab-draw {
+  stroke-dashoffset: 0;
+}
+
+/* capas (modo layer) y pasos acumulativos (modo step) */
+.lab .ly,
+.lab [data-s] {
+  transition: opacity 0.35s var(--m-ease);
+}
+.lab[data-cur]:not([data-cur="all"]) .ly { opacity: 0.16; }
+.lab[data-cur="est"] .ly[data-ly="est"],
+.lab[data-cur="bra"] .ly[data-ly="bra"],
+.lab[data-cur="mob"] .ly[data-ly="mob"],
+.lab[data-cur="ilu"] .ly[data-ly="ilu"] { opacity: 1; }
+.lab[data-cur="1"] :is([data-s="2"], [data-s="3"], [data-s="4"]),
+.lab[data-cur="2"] :is([data-s="3"], [data-s="4"]),
+.lab[data-cur="3"] [data-s="4"] { opacity: 0; }
+
+.lab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.35rem 0.9rem;
+  border: 1px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color var(--m-dur-s) ease, color var(--m-dur-s) ease;
+}
+.lab-btn:hover { background: var(--paper-2); }
+.lab-btn[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--paper);
+}
+.lab-btn[aria-pressed="true"]::before {
+  content: "●";
+  color: var(--signal);
+  font-size: 0.6rem;
+}
+.lab-btn-n {
+  display: inline-grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: 0.7rem;
+}
+
+/* hilo de proceso editorial (detalle): numerado, con línea que se traza al entrar */
+.lab-flow {
+  position: relative;
+  display: grid;
+  gap: 1.75rem 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 768px) {
+  .lab-flow { grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr)); }
+}
+.lab-flow li { position: relative; padding-top: 1.1rem; border-top: 1px solid var(--line-strong); }
+.lab-flow .lab-fn {
+  position: absolute;
+  top: -0.7rem;
+  left: 0;
+  background: var(--paper);
+  padding-right: 0.5rem;
+  color: var(--signal);
+}
+.lab-flow .lab-fb { position: absolute; left: 0; right: 0; top: -1px; height: 2px; background: var(--teal-deep); transform: scaleX(0); transform-origin: left; transition: transform var(--m-dur-l) var(--m-ease-io); transition-delay: calc(var(--k, 0) * 140ms); }
+.is-in .lab-flow .lab-fb { transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-draw { stroke-dashoffset: 0; transition: none; }
+  .lab .ly, .lab [data-s], .lab-btn { transition: none; }
+  .lab-flow .lab-fb { transform: none; transition: none; }
+}
+
+/* Hero de Servicios: ciclo trazado → composición final → fundido → reinicio (fase en data-phase, ver LabLoop) */
+.lab-loop .lab-draw { stroke-dashoffset: 0; }
+.lab-loop[data-phase="idle"] .lab-draw {
+  stroke-dashoffset: 1;
+  transition: none;
+}
+.lab-loop[data-phase="reset"] .lab-svg {
+  opacity: 0;
+  transition: opacity 0.5s var(--m-ease);
+}
+@media (prefers-reduced-motion: reduce) {
+  .lab-loop .lab-draw { stroke-dashoffset: 0 !important; }
+  .lab-loop[data-phase="reset"] .lab-svg { opacity: 1; transition: none; }
+}
+
+/* ---------- Archivo de proyectos (portafolio) ---------- */
+.pf-img { transition: transform var(--m-dur-l) var(--m-ease); }
+.pf-tick {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  opacity: 0;
+  border: 0 solid var(--signal);
+  transition: opacity var(--m-dur-s) ease, transform var(--m-dur-m) var(--m-ease);
+}
+.pf-tl { top: 8px; left: 8px; border-top-width: 2px; border-left-width: 2px; transform: translate(4px, 4px); }
+.pf-br { right: 8px; bottom: 8px; border-right-width: 2px; border-bottom-width: 2px; transform: translate(-4px, -4px); }
+.pf-arrow { transition: transform var(--m-dur-s) var(--m-ease); }
+.pf-card:focus-visible .pf-tick { opacity: 1; transform: none; }
+@media (hover: hover) {
+  .pf-card:hover .pf-img { transform: scale(1.03); }
+  .pf-card:hover .pf-tick { opacity: 1; transform: none; }
+  .pf-card:hover .pf-arrow { transform: translateX(4px); }
+  .pf-card:hover .pf-go { text-decoration: underline; text-underline-offset: 3px; }
+}
+.pf-fade { animation: pf-in 0.35s var(--m-ease); }
+@keyframes pf-in { from { opacity: 0; } to { opacity: 1; } }
+.pf-dialog {
+  max-width: 100vw;
+  max-height: 100svh;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  margin: auto;
+}
+.pf-dialog::backdrop { background: rgb(13 21 23 / 0.82); }
+@media (prefers-reduced-motion: reduce) {
+  .pf-img, .pf-tick, .pf-arrow { transition: none; }
+  .pf-card:hover .pf-img { transform: none; }
+  .pf-fade { animation: none; }
 }
