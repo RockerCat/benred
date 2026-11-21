@@ -14,6 +14,15 @@
   --teal: #258288;
   --mint: #64bdaf;
   --signal: #ff5a2b;
+  /* Jerarquía de CTAs: naranja = acción comercial principal (una por contexto);
+     verde petróleo = acción secundaria. #036473 es el verde del logo oficial
+     (public/brand/benred-logo-color.svg); --teal-deep (#026472) es su equivalente en el sitio. */
+  --cta: var(--signal);
+  --cta-ink: var(--ink);
+  --cta-hover: var(--ink);
+  --cta-2: var(--teal-deep);
+  --cta-2-ink: var(--paper);
+  --cta-2-hover: var(--ink);
   --line: rgb(13 21 23 / 0.16);
   --line-strong: rgb(13 21 23 / 0.45);
   --muted: #4a5659;
@@ -118,6 +127,55 @@ body {
   background: var(--ink);
   border-color: var(--ink);
   color: var(--paper);
+}
+.btn-primary:focus-visible {
+  outline-color: var(--ink);
+}
+.btn-secondary,
+.btn-secondary-fab {
+  background: var(--cta-2);
+  border-color: var(--cta-2);
+  color: var(--cta-2-ink);
+}
+.btn-secondary:hover,
+.btn-secondary-fab:hover {
+  background: var(--cta-2-hover);
+  border-color: var(--cta-2-hover);
+  color: var(--cta-2-ink);
+}
+.btn-secondary-fab {
+  border: 0;
+}
+/* CTA del header: el tono lo decide Header.tsx según si hay otro CTA principal visible */
+.btn-header {
+  transition: background-color 0.35s ease, border-color 0.35s ease, color 0.35s ease;
+}
+.btn-header[data-tone="secondary"] {
+  background: var(--cta-2);
+  border-color: var(--cta-2);
+  color: var(--cta-2-ink);
+}
+.btn-header[data-tone="secondary"]:hover,
+.btn-header[data-tone="primary"]:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn-header {
+    transition: none;
+  }
+}
+/* Botón blanco sobre fondo verde petróleo (bloque de contacto previo al footer) */
+.btn-on-teal {
+  background: #fff;
+  border-color: #fff;
+  color: var(--teal-deep);
+}
+.btn-on-teal:hover {
+  background: var(--paper);
+  border-color: var(--paper);
+  color: var(--ink);
 }
 .btn-ghost:hover {
   background: var(--ink);

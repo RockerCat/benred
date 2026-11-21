@@ -60,6 +60,7 @@ export default async function ServicioPage({ params }: PageProps<"/servicios/[sl
             href={whatsappLink(`Hola BenRed, quiero cotizar ${s.waHint}. `)}
             target="_blank"
             rel="noopener noreferrer"
+            data-cta-primary
             className="btn btn-primary mt-9"
           >
             Cotizar este servicio <span aria-hidden="true">→</span>

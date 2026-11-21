@@ -82,7 +82,7 @@ export function ContactForm() {
       )}
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <a className="btn btn-primary justify-center" href={whatsappLink(text)} target="_blank" rel="noopener noreferrer" onClick={guard}>
+        <a data-cta-primary className="btn btn-primary justify-center" href={whatsappLink(text)} target="_blank" rel="noopener noreferrer" onClick={guard}>
           Enviar por WhatsApp
         </a>
         <a className="btn btn-ghost justify-center" href={mailto} onClick={guard}>

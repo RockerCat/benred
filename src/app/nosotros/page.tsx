@@ -63,7 +63,7 @@ export default function NosotrosPage() {
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link href="/servicios" className="btn btn-ghost-light">Ver servicios</Link>
-            <Link href="/contacto" className="btn btn-primary">Contacto</Link>
+            <Link href="/contacto" data-cta-primary className="btn btn-primary">Contacto</Link>
           </div>
         </div>
       </section>

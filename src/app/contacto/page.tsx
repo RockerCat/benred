@@ -22,7 +22,7 @@ export default function ContactoPage() {
             Entre más claro el objetivo, la fecha y el espacio, más precisa la propuesta. Si no los
             tienes, escríbenos igual.
           </p>
-          <a href={whatsappLink(DEFAULT_WA_MESSAGE)} target="_blank" rel="noopener noreferrer" className="btn btn-primary mt-8">
+          <a href={whatsappLink(DEFAULT_WA_MESSAGE)} target="_blank" rel="noopener noreferrer" className="btn btn-secondary mt-8">
             Abrir WhatsApp · {SITE.phoneDisplay}
           </a>
           <address className="mt-10 space-y-3 border-t border-ink pt-6 not-italic">

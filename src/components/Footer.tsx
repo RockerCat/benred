@@ -24,6 +24,7 @@ export function Footer() {
             href={whatsappLink(DEFAULT_WA_MESSAGE)}
             target="_blank"
             rel="noopener noreferrer"
+            data-cta-primary
             className="btn btn-primary mt-8"
           >
             Cuéntanos tu proyecto

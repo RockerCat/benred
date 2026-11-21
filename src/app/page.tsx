@@ -68,6 +68,7 @@ export default function Home() {
                 href={whatsappLink(DEFAULT_WA_MESSAGE)}
                 target="_blank"
                 rel="noopener noreferrer"
+                data-cta-primary
                 className="btn btn-primary justify-center"
               >
                 Cuéntanos tu proyecto <span aria-hidden="true">→</span>
@@ -261,7 +262,7 @@ export default function Home() {
         <div className="mx-auto grid max-w-[1400px] items-end gap-8 px-5 py-20 sm:px-8 lg:grid-cols-12 lg:py-24">
           <RevealWords id="h-cta" className="font-display text-5xl font-bold leading-[0.95] sm:text-7xl lg:col-span-8" text="¿Qué vas a presentar en tu próximo evento?" />
           <div className="flex flex-col gap-3 lg:col-span-4">
-            <a href={whatsappLink(DEFAULT_WA_MESSAGE)} target="_blank" rel="noopener noreferrer" className="btn btn-primary justify-center">
+            <a href={whatsappLink(DEFAULT_WA_MESSAGE)} target="_blank" rel="noopener noreferrer" className="btn btn-on-teal justify-center">
               Escríbenos por WhatsApp
             </a>
             <Link href="/contacto" className="btn btn-ghost-light justify-center">Usar el formulario</Link>

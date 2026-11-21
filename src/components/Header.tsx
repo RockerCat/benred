@@ -10,6 +10,50 @@ export function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const btnRef = useRef<HTMLButtonElement>(null);
+  // Estado inicial coherente con el SSR: en páginas con CTA principal arriba del pliegue el
+  // header arranca en verde petróleo; el observer lo corrige en cuanto mide la visibilidad real.
+  const initialTone = pathname === "/" || pathname.startsWith("/servicios/") ? "secondary" : "primary";
+  const [tone, setTone] = useState<"primary" | "secondary">(initialTone);
+
+  // Un solo IntersectionObserver para todos los [data-cta-primary] de la página:
+  // si alguno está visible, el CTA del header pasa a verde petróleo; si ninguno, naranja.
+  useEffect(() => {
+    const visible = new Set<Element>();
+    const seen = new WeakSet<Element>();
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) visible.add(e.target);
+        else visible.delete(e.target);
+      }
+      setTone(visible.size > 0 ? "secondary" : "primary");
+    });
+    const scan = () => {
+      document.querySelectorAll("[data-cta-primary]").forEach((el) => {
+        if (!seen.has(el)) {
+          seen.add(el);
+          io.observe(el);
+        }
+      });
+    };
+    scan();
+    // Página sin CTA principal en su contenido: el header queda naranja.
+    const first = requestAnimationFrame(() => {
+      if (!document.querySelector("[data-cta-primary]")) setTone("primary");
+    });
+    // Contenido que llega después (streaming / Suspense): re-escanea sin escuchar scroll.
+    let raf = 0;
+    const mo = new MutationObserver(() => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(scan);
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+    return () => {
+      cancelAnimationFrame(raf);
+      cancelAnimationFrame(first);
+      mo.disconnect();
+      io.disconnect();
+    };
+  }, [pathname]);
 
   useEffect(() => {
     if (!open) return;
@@ -32,7 +76,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-paper/92 backdrop-blur">
       <div className="mx-auto flex h-[72px] max-w-[1400px] items-center justify-between px-5 sm:px-8">
-        <Link href="/" aria-label="BenRed, inicio" className="flex items-center gap-3">
+        <Link href="/" aria-label="BenRed, inicio" className="flex items-center gap-2.5 sm:gap-3">
           <Image
             src="/brand/benred-mark-color.svg"
             alt=""
@@ -42,8 +86,17 @@ export function Header() {
             unoptimized
             className="h-11 w-auto"
           />
+          <Image
+            src="/brand/benred-texto.png"
+            alt=""
+            width={300}
+            height={61}
+            priority
+            unoptimized
+            className="h-[18px] w-auto shrink-0 sm:h-[22px]"
+          />
           <span className="sr-only">BenRed</span>
-          <span aria-hidden="true" className="label hidden border-l border-[var(--line-strong)] pl-3 leading-tight text-muted sm:block">
+          <span aria-hidden="true" className="label hidden border-l border-[var(--line-strong)] pl-3 leading-tight text-muted xl:block">
             Marketing experiencial
             <br />
             Stands · Eventos
@@ -65,7 +118,8 @@ export function Header() {
             href={whatsappLink(DEFAULT_WA_MESSAGE)}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn btn-primary !min-h-11 !px-5"
+            data-tone={tone}
+            className="btn btn-primary btn-header !min-h-11 !px-5"
           >
             Cuéntanos tu proyecto
           </a>

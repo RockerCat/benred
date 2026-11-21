@@ -16,7 +16,7 @@ export function PortfolioCta() {
           </p>
         </div>
         <div className="rg-item lg:col-span-4 lg:justify-self-end" style={{ ["--k" as string]: 3 }}>
-          <Link href="/contacto" className="btn btn-primary">
+          <Link href="/contacto" data-cta-primary className="btn btn-primary">
             Cuéntanos tu proyecto <span aria-hidden="true">→</span>
           </Link>
         </div>
