@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { EventHall } from "@/components/EventHall";
 import { LabFlow, StandSheet } from "@/components/LabDiagrams";
 import { Reveal } from "@/components/Reveal";
 import { StandMorph } from "@/components/StandMorph";
@@ -85,6 +86,7 @@ async function Servicio({ params }: Pick<PageProps<"/servicios/[slug]">, "params
       </section>
 
       {s.slug === "stands-y-montajes" && <StandMorph />}
+      {s.slug === "produccion-y-logistica-de-eventos" && <EventHall />}
 
       <section className="mx-auto max-w-[1400px] px-5 py-14 sm:px-8 lg:py-20" aria-label="Visualización técnica del servicio">
         {s.slug === "marketing-experiencial-btl" && (
