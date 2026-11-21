@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { LabFlow, StandSheet } from "@/components/LabDiagrams";
 import { Reveal } from "@/components/Reveal";
+import { StandMorph } from "@/components/StandMorph";
 import { TouchpointMap } from "@/components/TouchpointMap";
 import { WorkCard } from "@/components/WorkCard";
 import { PROJECTS, SERVICES, whatsappLink } from "@/lib/site";
@@ -82,6 +83,8 @@ async function Servicio({ params }: Pick<PageProps<"/servicios/[slug]">, "params
           </a>
         </div>
       </section>
+
+      {s.slug === "stands-y-montajes" && <StandMorph />}
 
       <section className="mx-auto max-w-[1400px] px-5 py-14 sm:px-8 lg:py-20" aria-label="Visualización técnica del servicio">
         {s.slug === "marketing-experiencial-btl" && (

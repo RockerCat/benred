@@ -1017,3 +1017,76 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .tp *, .tp .tp-n, .tp-leg li { transition: none !important; animation: none !important; }
 }
+
+/* ---------- «Un espacio, tres posibilidades» (StandMorph): stand isométrico ligado al scroll ---------- */
+.sm-track {
+  --sm-extra: 280vh; /* = EXTRA_VH.desktop */
+  position: relative;
+}
+.sm-stage {
+  position: sticky;
+  top: 88px;
+  padding-bottom: 0.5rem;
+}
+.sm-frame {
+  height: min(calc(100svh - 200px), 700px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sm {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.sm-spacer { height: var(--sm-extra); }
+.sm-t {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  fill: var(--ink);
+}
+.sm-cap {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4rem 1.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line-strong);
+}
+.sm-bar { position: absolute; left: 0; right: 0; top: -1px; height: 2px; }
+.sm-bar-fill { display: block; height: 100%; background: var(--mint); transform-origin: left center; transform: scaleX(0); }
+.sm-steps { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; margin: 0; padding: 0; list-style: none; font-weight: 500; font-size: 0.95rem; }
+.sm-steps li { opacity: 0.35; transition: opacity 0.4s var(--m-ease); }
+.sm-steps .label { color: var(--signal); }
+.sm-track[data-step="1"] .sm-steps li[data-i="1"],
+.sm-track[data-step="2"] .sm-steps li[data-i="2"],
+.sm-track[data-step="3"] .sm-steps li[data-i="3"],
+.sm-track[data-step="4"] .sm-steps li[data-i="4"] { opacity: 1; }
+/* movimiento ambiental (solo con el escenario visible): balanceo muy sutil y brillo de pantallas */
+.sm.live .sm-body { animation: sm-sway 3.4s ease-in-out infinite alternate; }
+.sm.live .sm-wave { transform-box: fill-box; transform-origin: 0% 100%; animation: sm-wave 2.6s ease-in-out infinite alternate; }
+.sm.live .sm-sb0 { animation: sm-glow 2.8s ease-in-out infinite alternate; }
+.sm.live .sm-sb1 { animation: sm-glow 3.4s ease-in-out -1s infinite alternate; }
+.sm.live .sm-sb2 { animation: sm-glow 4s ease-in-out -2s infinite alternate; }
+@keyframes sm-sway { from { transform: translateY(0); } to { transform: translateY(-0.8px); } }
+@keyframes sm-wave { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
+@keyframes sm-glow { from { opacity: 0.45; } to { opacity: 1; } }
+@media (max-width: 767px) {
+  .sm-track { --sm-extra: 200vh; }
+  .sm-stage { top: 80px; }
+  .sm-frame { height: auto; }
+  .sm { height: auto; }
+  .sm-steps { font-size: 0.9rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sm-spacer { height: 0; }
+  .sm-stage { position: static; }
+  .sm-frame { height: auto; }
+  .sm-steps li { transition: none; opacity: 0.35; }
+  .sm-bar { display: none; }
+  .sm * { animation: none !important; }
+}
