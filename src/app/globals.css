@@ -927,3 +927,93 @@ body {
   .pf-card:hover .pf-img { transform: none; }
   .pf-fade { animation: none; }
 }
+
+/* ---------- Visor de imágenes del portafolio ---------- */
+.lb-nav {
+  display: inline-flex;
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgb(255 255 255 / 0.5);
+  color: var(--paper);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.lb-nav:hover { background: var(--paper); color: var(--ink); }
+.lb-dialog[open] { animation: lb-in 0.22s ease-out; }
+.lb-img { animation: lb-img 0.25s ease-out; }
+@keyframes lb-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes lb-img { from { opacity: 0; transform: scale(0.985); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .lb-dialog[open], .lb-img { animation: none; }
+  .lb-nav { transition: none; }
+}
+
+/* ---------- Ecosistema «Marca + Público» (TouchpointMap): construcción, ciclo ambiental e interacción ---------- */
+.tp .tp-core, .tp .tp-dot, .tp .tp-ripple { transform-box: fill-box; transform-origin: center; }
+.tp .tp-n { outline: none; cursor: pointer; transition: opacity 0.35s var(--m-ease); }
+.tp .tp-line { transition: stroke-width 0.35s var(--m-ease); }
+.tp .tp-dot { transition: transform 0.35s var(--m-ease); }
+.tp .tp-lbl { transition: fill 0.35s var(--m-ease); }
+.tp .tp-hit { fill: transparent; }
+.tp .tp-focus { fill: none; stroke: var(--teal-deep); stroke-width: 2; opacity: 0; }
+.tp .tp-n:focus-visible .tp-focus { opacity: 1; }
+.tp .tp-ringmask { fill: none; stroke: #fff; stroke-width: 6; stroke-dasharray: 1; stroke-dashoffset: 0; }
+.tp .tp-ripple { fill: none; stroke: var(--signal); stroke-width: 1.5; opacity: 0; pointer-events: none; }
+.tp .tp-pulse { fill: none; stroke: var(--teal); stroke-width: 3.2; stroke-linecap: round; stroke-dasharray: 0.09 2; stroke-dashoffset: 0.09; opacity: 0; pointer-events: none; }
+
+/* resalte del nodo activo (ratón, toque o teclado): conexión más presente, el resto atenuado sin ocultarse */
+.tp[data-active] .tp-n:not([data-a]) { opacity: 0.5; }
+.tp .tp-n[data-a] .tp-line { stroke-width: 2.8; }
+.tp .tp-n[data-a] .tp-dot { transform: scale(1.2); }
+.tp .tp-n[data-a] .tp-lbl { fill: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+.tp-leg li { transition: color 0.3s var(--m-ease), opacity 0.3s var(--m-ease); }
+.tp-leg li[data-a] { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+
+/* construcción (~5 s): núcleo 0–0,8 · conexiones 0,8–2,8 · nodos 1,5–3,1 · etiquetas 1,9–3,6 · circunferencia 3,6–5 */
+.tp[data-phase="idle"] .tp-core { opacity: 0; transform: scale(0.94); }
+.tp[data-phase="idle"] .tp-line { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.tp[data-phase="idle"] .tp-dot { opacity: 0; transform: scale(0.8); }
+.tp[data-phase="idle"] .tp-lbl, .tp-leg[data-phase="idle"] li { opacity: 0; }
+.tp[data-phase="idle"] .tp-ringmask { stroke-dashoffset: 1; }
+.tp[data-phase="idle"] :is(.tp-core, .tp-line, .tp-dot, .tp-lbl, .tp-ringmask), .tp-leg[data-phase="idle"] li { transition: none; }
+.tp[data-phase="play"] .tp-core { transition: opacity 0.8s var(--m-ease), transform 0.8s var(--m-ease); }
+.tp[data-phase="play"] .tp-line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.8s var(--m-ease-io) calc(0.8s + var(--i) * 0.3s), stroke-width 0.35s var(--m-ease);
+}
+.tp[data-phase="play"] .tp-dot {
+  transition: opacity 0.4s ease calc(1.5s + var(--i) * 0.3s), transform 0.5s var(--m-ease) calc(1.5s + var(--i) * 0.3s);
+}
+.tp[data-phase="play"] .tp-ripple { animation: tp-ripple 0.9s ease-out calc(1.6s + var(--i) * 0.3s) forwards; }
+.tp[data-phase="play"] .tp-lbl, .tp-leg[data-phase="play"] li { transition: opacity 0.5s ease calc(1.9s + var(--i) * 0.3s), fill 0.35s var(--m-ease), color 0.3s; }
+.tp[data-phase="play"] .tp-ringmask { transition: stroke-dashoffset 1.4s var(--m-ease-io) 3.6s; }
+@keyframes tp-ripple {
+  from { opacity: 0.6; transform: scale(1); }
+  to { opacity: 0; transform: scale(2.6); }
+}
+
+/* ciclo ambiental de 15 s (solo con data-amb): A 7 s impulsos · B 5 s respuesta · C 3 s descanso */
+.tp[data-amb="a"] .tp-pulse { animation: tp-pulse 1.4s var(--m-ease-io) calc(var(--i) * 1.4s) both; }
+.tp[data-amb="a"] .tp-ripple { animation: tp-ripple 0.9s ease-out calc(var(--i) * 1.4s + 1.25s) forwards; }
+.tp[data-amb="b"] .tp-line { animation: tp-glow 1.3s ease-in-out calc(var(--i) * 0.7s) both; }
+.tp[data-amb="b"] .tp-dot { animation: tp-nod 1.3s ease-in-out calc(var(--i) * 0.7s) both; }
+.tp[data-amb="b"] .tp-core { animation: tp-core 1.6s ease-in-out 3; }
+.tp[data-amb="c"] .tp-core { animation: tp-breath 3s ease-in-out; }
+.tp[data-amb="c"] .tp-ring { animation: tp-ringbreath 3s ease-in-out; }
+@keyframes tp-pulse {
+  0% { opacity: 0; stroke-dashoffset: 0.09; }
+  12%, 88% { opacity: 0.95; }
+  100% { opacity: 0; stroke-dashoffset: -1; }
+}
+@keyframes tp-glow { 0%, 100% { stroke-width: 1.4; } 50% { stroke-width: 3; } }
+@keyframes tp-nod { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.14); } }
+@keyframes tp-core { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.035); } }
+@keyframes tp-breath { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.012); } }
+@keyframes tp-ringbreath { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .tp *, .tp .tp-n, .tp-leg li { transition: none !important; animation: none !important; }
+}

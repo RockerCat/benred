@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { PortfolioCard } from "@/components/PortfolioCard";
 import { PortfolioCta } from "@/components/PortfolioCta";
 import { ProjectGallery } from "@/components/ProjectGallery";
 import { Reveal } from "@/components/Reveal";
@@ -11,13 +10,14 @@ import { CATEGORY_LABEL, coverSrc, entryAlt, entryBySlug, KIND_NOTE, PORTFOLIO }
 import { workSrc } from "@/lib/site";
 
 export function generateStaticParams() {
-  return PORTFOLIO.map((e) => ({ slug: e.slug }));
+  // Única ficha individual: Tunja Tattoo Festival. Las demás rutas antiguas se redirigen en next.config.ts.
+  return PORTFOLIO.filter((e) => e.role).map((e) => ({ slug: e.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps<"/portafolio/[slug]">): Promise<Metadata> {
   const { slug } = await params;
   const e = entryBySlug(slug);
-  if (!e) return {};
+  if (!e?.role) return {};
   const desc = e.service
     ? `${e.title}: ${e.status ? `proyecto de ${e.service.toLowerCase()} realizado por BenRed` : "proyecto de stand de BenRed, que diseña, produce y monta stands"}. ${e.kind === "Render 3D" ? "La imagen es el render 3D de la etapa de diseño." : "La imagen es una fotografía del montaje."}`
     : e.role
@@ -47,15 +47,10 @@ export default function ProyectoPage({ params }: PageProps<"/portafolio/[slug]">
 async function Proyecto({ params }: Pick<PageProps<"/portafolio/[slug]">, "params">) {
   const { slug } = await params;
   const e = entryBySlug(slug);
-  if (!e) notFound();
+  if (!e?.role) notFound();
 
-  const idx = PORTFOLIO.findIndex((x) => x.slug === e.slug);
-  const prev = PORTFOLIO[(idx - 1 + PORTFOLIO.length) % PORTFOLIO.length];
-  const next = PORTFOLIO[(idx + 1) % PORTFOLIO.length];
-  const related = PORTFOLIO.filter((x) => x.category === e.category && x.slug !== e.slug).slice(0, 3);
   const multi = e.images.length > 1;
   const c = e.cover;
-  const total = String(PORTFOLIO.length).padStart(2, "0");
 
   return (
     <>
@@ -66,7 +61,7 @@ async function Proyecto({ params }: Pick<PageProps<"/portafolio/[slug]">, "param
           </nav>
           <div className="mt-6 grid gap-6 lg:grid-cols-12 lg:items-end">
             <div className="lg:col-span-8">
-              <p className="label text-signal">Proyecto {String(e.n).padStart(2, "0")} / {total}</p>
+              <p className="label text-signal">Proyecto</p>
               <h1 className="font-display mt-3 text-5xl font-bold leading-[0.95] sm:text-7xl">{e.title}</h1>
             </div>
             <dl className="grid grid-cols-2 gap-4 border-t border-ink pt-3 lg:col-span-4">
@@ -75,8 +70,8 @@ async function Proyecto({ params }: Pick<PageProps<"/portafolio/[slug]">, "param
                 <dd className="mt-1">{CATEGORY_LABEL[e.category]}</dd>
               </div>
               <div>
-                <dt className="label text-muted">{e.projectType ? "Tipo de proyecto" : "Tipo de material"}</dt>
-                <dd className="mt-1">{e.projectType ? e.label : e.material}</dd>
+                <dt className="label text-muted">{e.projectType ? "Tipo de proyecto" : e.service ? "Servicio" : "Tipo de material"}</dt>
+                <dd className="mt-1">{e.projectType ? e.label : e.service ?? e.material}</dd>
               </div>
             </dl>
           </div>
@@ -161,33 +156,10 @@ async function Proyecto({ params }: Pick<PageProps<"/portafolio/[slug]">, "param
       </section>
 
       <section className="border-t border-ink">
-        <div className="mx-auto grid max-w-[1400px] sm:grid-cols-2">
-          <Link href={`/portafolio/${prev.slug}`} className="group flex flex-col gap-1 border-b border-[var(--line)] px-5 py-8 hover:bg-paper-2 sm:border-b-0 sm:border-r sm:px-8">
-            <span className="label text-muted">← Proyecto anterior</span>
-            <span className="font-display text-2xl font-semibold">{prev.title}</span>
-          </Link>
-          <Link href={`/portafolio/${next.slug}`} className="group flex flex-col gap-1 px-5 py-8 text-left hover:bg-paper-2 sm:px-8 sm:text-right">
-            <span className="label text-muted">Proyecto siguiente →</span>
-            <span className="font-display text-2xl font-semibold">{next.title}</span>
-          </Link>
+        <div className="mx-auto max-w-[1400px] px-5 py-10 sm:px-8">
+          <Link href="/portafolio" className="btn btn-ghost">← Ver todo el portafolio</Link>
         </div>
       </section>
-
-      {related.length > 0 && (
-        <section className="bg-paper-2">
-          <div className="mx-auto max-w-[1400px] px-5 py-14 sm:px-8 lg:py-20">
-            <h2 className="label text-muted">Más de {CATEGORY_LABEL[e.category].toLowerCase()}</h2>
-            <ul className="mt-6 grid items-start gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-              {related.map((r, i) => (
-                <li key={r.slug}>
-                  <PortfolioCard e={r} delay={i * 70} sizes="(min-width:1024px) 30vw, (min-width:640px) 45vw, 100vw" />
-                </li>
-              ))}
-            </ul>
-            <Link href="/portafolio" className="btn btn-ghost mt-10">Ver todo el portafolio</Link>
-          </div>
-        </section>
-      )}
 
       <PortfolioCta />
     </>

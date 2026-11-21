@@ -251,43 +251,7 @@ export function EventDiagram() {
   );
 }
 
-/* ---------------------------------------------------------------- detalle: puntos de contacto (marketing) */
-
-export function TouchpointMap({ nodes }: { nodes: string[] }) {
-  const cx = 320, cy = 210, R = 150;
-  const n = nodes.length;
-  return (
-    <svg viewBox="0 0 640 420" className="lab-svg" role="img" aria-label={`Mapa conceptual de puntos de contacto de una activación: ${nodes.join(", ")}.`}>
-      <circle cx={cx} cy={cy} r={R} className="ln ln-faint" strokeDasharray="2 5" />
-      <circle cx={cx} cy={cy} r="48" className="fl-ink" />
-      <text x={cx} y={cy - 2} textAnchor="middle" className="t t-inv">MARCA</text>
-      <text x={cx} y={cy + 14} textAnchor="middle" className="t t-inv t-s2">+ PÚBLICO</text>
-      {nodes.map((label, i) => {
-        const a = -Math.PI / 2 + (i * 2 * Math.PI) / n;
-        const x = cx + Math.cos(a) * R, y = cy + Math.sin(a) * R;
-        const sx = cx + Math.cos(a) * 48, sy = cy + Math.sin(a) * 48;
-        const right = Math.cos(a) > 0.2, left = Math.cos(a) < -0.2;
-        const lx = right ? x + 18 : left ? x - 18 : x;
-        const words = label.split(" ");
-        const half = Math.ceil(words.length / 2);
-        const lines = words.length > 3 ? [words.slice(0, half).join(" "), words.slice(half).join(" ")] : [label];
-        const ly = right || left ? y + 4 : y + (Math.sin(a) < 0 ? -20 - 14 * (lines.length - 1) : 28);
-        return (
-          <g key={label}>
-            <path d={`M${sx.toFixed(1)} ${sy.toFixed(1)}L${x.toFixed(1)} ${y.toFixed(1)}`} {...draw(i)} className="ln ln-t lab-draw" />
-            <circle cx={x} cy={y} r="11" className="fl-s" />
-            <text x={x} y={y + 4} textAnchor="middle" className="t t-inv">{i + 1}</text>
-            <text x={lx} y={ly} textAnchor={right ? "start" : left ? "end" : "middle"} className="t t-s">
-              {lines.map((l, j) => (
-                <tspan key={j} x={lx} dy={j === 0 ? 0 : 14}>{l.toUpperCase()}</tspan>
-              ))}
-            </text>
-          </g>
-        );
-      })}
-    </svg>
-  );
-}
+/* El mapa de puntos de contacto vive en TouchpointMap.tsx (componente cliente con animación e interacción). */
 
 /* ---------------------------------------------------------------- detalle: hoja técnica de stand (planta + alzado) */
 

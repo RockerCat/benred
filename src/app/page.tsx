@@ -32,7 +32,7 @@ export default function Home() {
     alternateName: "B EN RED",
     url: SITE.url,
     description:
-      "Agencia de marketing experiencial, BTL, diseño y montaje de stands y producción de eventos en Colombia.",
+      "Agencia de marketing experiencial, BTL, diseño, producción y montaje de stands especiales y producción de eventos en Colombia.",
     email: SITE.emailPrimary,
     telephone: `+${SITE.whatsappNumber}`,
     areaServed: "CO",
@@ -183,9 +183,6 @@ export default function Home() {
             <div className="md:col-span-2"><WorkCard p={byId("aipa")} sizes="(min-width:768px) 33vw, 100vw" className="aspect-[16/10]" /></div>
             <div className="md:col-span-2"><WorkCard p={byId("banquete")} sizes="(min-width:768px) 33vw, 100vw" className="aspect-[16/10]" /></div>
           </div>
-          <p className="label mt-6 text-paper/60">
-            “Render 3D” es la visualización del diseño previa a la construcción; “Fotografía” es registro del montaje.
-          </p>
         </div>
       </section>
 

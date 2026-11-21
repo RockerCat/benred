@@ -7,12 +7,11 @@ import { PIECES, PORTFOLIO } from "@/lib/portfolio";
 export const metadata: Metadata = {
   title: "Portafolio: ideas que tomaron forma",
   description:
-    "Archivo de proyectos de BenRed: diseño, producción y montaje de stands y eventos. Visualizaciones 3D de la etapa de diseño, fotografía de montaje y el Tunja Tattoo Festival, cuyas cuatro ediciones BenRed organizó y produjo de forma integral. Cada pieza indica su tipo de evidencia.",
+    "Archivo de proyectos de BenRed: diseño, producción y montaje de stands especiales, y eventos. Visualizaciones 3D de la etapa de diseño, fotografía de montaje y el Tunja Tattoo Festival, cuyas cuatro ediciones BenRed organizó y produjo de forma integral.",
   alternates: { canonical: "/portafolio" },
 };
 
 export default function PortafolioPage() {
-  const kinds = ["Render 3D", "Fotografía", "Afiche"] as const;
   return (
     <>
       <section className="grid-paper border-b border-[var(--line)]">
@@ -34,14 +33,6 @@ export default function PortafolioPage() {
                 <dt className="label text-muted">Piezas</dt>
                 <dd className="font-display text-3xl font-bold">{String(PIECES).padStart(2, "0")}</dd>
               </div>
-              <div>
-                <dt className="label text-muted">Evidencia</dt>
-                <dd className="label mt-2 flex flex-wrap gap-2">
-                  {kinds.map((k) => (
-                    <span key={k} className="border border-ink px-1.5 py-0.5">{k}</span>
-                  ))}
-                </dd>
-              </div>
             </dl>
           </Reveal>
         </div>
@@ -49,10 +40,6 @@ export default function PortafolioPage() {
 
       <section className="mx-auto max-w-[1400px] px-5 py-14 sm:px-8 lg:py-20">
         <PortfolioGallery />
-        <p className="mt-14 max-w-2xl border-t border-[var(--line)] pt-4 text-sm text-muted">
-          Cada pieza indica si es un render de diseño, una fotografía de montaje o un afiche. Los renders documentan la
-          etapa de diseño de un stand y no son fotografías del resultado final; los afiches documentan las ediciones de un festival que BenRed organizó y produjo. Seguimos sumando registro fotográfico de proyectos ejecutados.
-        </p>
       </section>
       <PortfolioCta />
     </>

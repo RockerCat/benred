@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { LabFlow, StandSheet, TouchpointMap } from "@/components/LabDiagrams";
+import { Suspense } from "react";
+import { LabFlow, StandSheet } from "@/components/LabDiagrams";
 import { Reveal } from "@/components/Reveal";
+import { TouchpointMap } from "@/components/TouchpointMap";
 import { WorkCard } from "@/components/WorkCard";
 import { PROJECTS, SERVICES, whatsappLink } from "@/lib/site";
 
@@ -21,7 +23,20 @@ export async function generateMetadata({ params }: PageProps<"/servicios/[slug]"
   };
 }
 
-export default async function ServicioPage({ params }: PageProps<"/servicios/[slug]">) {
+/**
+ * Con `partialPrefetching`, leer `params` en la raíz de la página ata el App Shell a una URL concreta
+ * (aviso "URL data outside of Suspense"). La lectura de `params` va dentro de <Suspense>; las tres páginas
+ * siguen prerenderizadas por generateStaticParams. Mismo patrón que /portafolio/[slug].
+ */
+export default function ServicioPage({ params }: PageProps<"/servicios/[slug]">) {
+  return (
+    <Suspense fallback={<div className="grid-paper min-h-[60svh] border-b border-[var(--line)]" aria-busy="true" />}>
+      <Servicio params={params} />
+    </Suspense>
+  );
+}
+
+async function Servicio({ params }: Pick<PageProps<"/servicios/[slug]">, "params">) {
   const { slug } = await params;
   const s = SERVICES.find((x) => x.slug === slug);
   if (!s) notFound();

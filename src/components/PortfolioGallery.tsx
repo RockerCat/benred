@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { PIECES, PORTFOLIO, type Entry } from "@/lib/portfolio";
+import { coverSrc, entryAlt } from "@/lib/portfolio";
+import { Lightbox } from "./Lightbox";
 import { PortfolioCard } from "./PortfolioCard";
 
 const FILTERS = [
@@ -29,9 +31,17 @@ const TARGET = 3.1; // suma de proporciones a partir de la cual la fila ocupa to
 
 export function PortfolioGallery() {
   const [f, setF] = useState<(typeof FILTERS)[number]["id"]>("todo");
-  const items = PORTFOLIO.filter((e) => f === "todo" || e.category === f);
+  const items = useMemo(() => PORTFOLIO.filter((e) => f === "todo" || e.category === f), [f]);
   const pieces = f === "todo" ? PIECES : items.reduce((a, e) => a + e.images.length, 0);
   const rows = toRows(items);
+
+  // Secuencia del visor: solo imágenes genéricas del filtro activo, en el orden visible (Tunja Tattoo Festival abre su página)
+  const seq = useMemo(() => items.filter((e) => !e.role), [items]);
+  const [open, setOpen] = useState<number | null>(null);
+  const images = useMemo(
+    () => seq.map((e) => ({ src: coverSrc(e), alt: entryAlt(e), w: e.cover.w, h: e.cover.h })),
+    [seq],
+  );
 
   return (
     <div>
@@ -41,7 +51,10 @@ export function PortfolioGallery() {
             key={x.id}
             type="button"
             aria-pressed={f === x.id}
-            onClick={() => setF(x.id)}
+            onClick={() => {
+              setOpen(null);
+              setF(x.id);
+            }}
             className={`label min-h-11 border border-ink px-5 transition-colors ${f === x.id ? "bg-ink text-paper" : "hover:bg-ink/10"}`}
           >
             {f === x.id ? <span aria-hidden="true" className="mr-2 text-signal">●</span> : null}
@@ -73,6 +86,7 @@ export function PortfolioGallery() {
                     e={e}
                     delay={ci * 70}
                     priority={ri === 0}
+                    onOpen={() => setOpen(seq.indexOf(e))}
                     sizes={`(min-width:1024px) ${Math.round((100 * ratio(e)) / Math.max(sum, TARGET))}vw, 100vw`}
                   />
                 </div>
@@ -81,6 +95,7 @@ export function PortfolioGallery() {
           );
         })}
       </div>
+      <Lightbox images={images} index={open} onIndex={setOpen} onClose={() => setOpen(null)} />
     </div>
   );
 }

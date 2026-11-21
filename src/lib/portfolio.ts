@@ -1,4 +1,4 @@
-import { PROJECTS, TATTOO_POSTERS, workSrc, type Project } from "./site";
+import { PROJECTS, TATTOO_POSTERS, projectAlt, workSrc, type Project } from "./site";
 
 /**
  * Archivo de proyectos. Fuente de verdad: PROJECTS y TATTOO_POSTERS de site.ts (no se duplican datos).
@@ -83,12 +83,19 @@ const CONFIG: Array<{ slug: string; ids: string[]; title?: string; cover?: strin
  * `executed` (confirmado por BenRed) habilita el estado "Ejecutado" y el lenguaje de proyecto realizado. Los demás
  * renders conservan una descripción neutral: su ejecución física está pendiente de confirmación.
  */
-const STAND_SERVICE = "Diseño, producción y montaje de stands";
+const STAND_SERVICE = "Diseño, producción y montaje de stands especiales";
 function standCopy(kind: Evidence, executed: boolean): string {
   if (kind === "Fotografía") return "Proyecto de stand de BenRed. La imagen es una fotografía del montaje físico.";
   return executed
     ? "Proyecto de diseño, producción y montaje de stand realizado por BenRed. La imagen corresponde a la visualización 3D utilizada durante la etapa de diseño, previa a su construcción física."
     : "Proyecto de stand de BenRed, que diseña, produce y monta stands. La imagen es la visualización 3D de la etapa de diseño, previa a la construcción.";
+}
+
+/** Denominación neutral (sin cliente inferido) para proyectos sin nombre confirmado. */
+const neutralCount: Record<string, number> = {};
+function neutralTitle(category: Project["category"]): string {
+  const n = (neutralCount[category] = (neutralCount[category] ?? 0) + 1);
+  return `Proyecto de ${category} ${String(n).padStart(2, "0")}`;
 }
 
 export const PORTFOLIO: Entry[] = CONFIG.map((c, i) => {
@@ -97,7 +104,7 @@ export const PORTFOLIO: Entry[] = CONFIG.map((c, i) => {
   return {
     slug: c.slug,
     n: i + 1,
-    title: c.title ?? cover.title,
+    title: c.title ?? neutralTitle(cover.category),
     category: cover.category,
     kind: cover.kind,
     cover,
@@ -136,4 +143,4 @@ export const KIND_NOTE: Record<Evidence, string> = {
 export const entryBySlug = (slug: string) => PORTFOLIO.find((e) => e.slug === slug);
 export const coverSrc = (e: Entry) => workSrc(e.cover, "lg");
 export const entryAlt = (e: Entry) =>
-  e.images.length > 1 ? `${e.kind}s: ${e.title}` : `${e.kind}: ${e.title}`;
+  e.images.length > 1 ? `${e.kind}s: ${e.title}` : projectAlt(e.cover);

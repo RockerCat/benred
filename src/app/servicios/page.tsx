@@ -17,7 +17,7 @@ import { SERVICES } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Servicios: marketing experiencial, stands y eventos",
   description:
-    "Marketing experiencial y BTL, diseño y montaje de stands, producción y logística de eventos en Colombia. Conoce el alcance de cada servicio de BenRed.",
+    "Marketing experiencial y BTL; diseño, producción y montaje de stands especiales; y producción y logística de eventos en Colombia. Conoce el alcance de cada servicio de BenRed.",
   alternates: { canonical: "/servicios" },
 };
 
@@ -52,10 +52,10 @@ export default function ServiciosPage() {
   return (
     <>
       <section className="grid-paper border-b border-[var(--line)]">
-        <div className="mx-auto grid max-w-[1400px] items-center gap-10 px-5 py-16 sm:px-8 lg:grid-cols-12 lg:py-24">
+        <div className="mx-auto grid max-w-[1400px] items-center gap-10 px-5 pb-12 pt-6 sm:px-8 sm:py-16 lg:grid-cols-12 lg:py-24">
           <div className="lg:col-span-7">
             <p className="label text-teal-deep">Servicios · Laboratorio creativo</p>
-            <h1 className="font-display mt-4 max-w-5xl text-5xl font-bold leading-[0.95] sm:text-7xl">
+            <h1 className="font-display mt-4 max-w-5xl text-[2.6rem] font-bold leading-[0.95] sm:text-7xl">
               Lo que diseñamos, producimos y operamos.
             </h1>
             <p className="mt-6 max-w-2xl text-xl text-ink/85">
@@ -63,7 +63,7 @@ export default function ServiciosPage() {
               incluir una activación. Hablas con el mismo equipo en todos.
             </p>
           </div>
-          <LabLoop className="lg:col-span-5">
+          <LabLoop className="max-lg:order-first lg:col-span-5">
             <ServicesMap />
           </LabLoop>
         </div>

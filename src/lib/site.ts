@@ -79,12 +79,12 @@ export const SERVICES: Service[] = [
   {
     slug: "stands-y-montajes",
     n: "02",
-    name: "Diseño, producción y montaje de stands",
-    short: "Del render al piso de feria: diseñamos, producimos y montamos tu stand.",
+    name: "Diseño, producción y montaje de stands especiales",
+    short: "Del diseño al piso de feria: diseñamos, producimos y montamos tu stand.",
     headline: "Tu stand, diseñado en 3D y montado en feria.",
     lead: "Un solo equipo se encarga de diseñar el stand, producirlo y montarlo. Trabajamos a la medida de cada marca, entidad o evento, desde stands comerciales hasta espacios institucionales.",
     scope: [
-      "Diseño y renders 3D del stand",
+      "Diseño del stand y visualización 3D previa a la construcción",
       "Producción de estructura, mobiliario y gráfica",
       "Montaje y desmontaje en el recinto",
       "Integración de pantallas, iluminación y exhibición de producto",
@@ -95,9 +95,9 @@ export const SERVICES: Service[] = [
       "Metros cuadrados y ubicación del espacio",
       "Marca, productos y qué quieres comunicar",
     ],
-    seoTitle: "Diseño, producción y montaje de stands en Colombia",
+    seoTitle: "Diseño, producción y montaje de stands especiales en Colombia",
     seoDescription:
-      "Diseño 3D, producción y montaje de stands para ferias y eventos en Colombia. BenRed lleva tu marca del render al piso de feria.",
+      "Diseño, producción y montaje de stands especiales para ferias y exposiciones en Colombia. BenRed lleva tu marca del diseño 3D al piso de feria.",
     waHint: "el diseño y montaje de un stand",
   },
   {
@@ -137,22 +137,25 @@ export type Project = {
   h: number;
   hasLarge: boolean;
   note?: string;
+  /** Nombre interno heredado (no verificado): no se muestra públicamente. */
+  internalName?: string;
 };
 
 /**
  * Material publicado por BenRed en benred.co (carga de septiembre/octubre 2024).
- * Los stands son renders de diseño, salvo "Stand Tunja" que es fotografía de montaje.
+ * Los stands son renders de diseño, salvo "tunja" (fotografía de montaje). Los títulos son neutrales: los nombres
+ * anteriores quedan solo como `internalName`, porque no están confirmados.
  */
 export const PROJECTS: Project[] = [
-  { id: "tunja", title: "Stand de Tunja", category: "stand", kind: "Fotografía", file: "stand-tunja", w: 1600, h: 1200, hasLarge: true },
-  { id: "fne-b", title: "Stand Fedesmeraldas", category: "stand", kind: "Render 3D", file: "stand-fne-b", w: 1280, h: 720, hasLarge: true },
-  { id: "usana", title: "Stand USANA", category: "stand", kind: "Render 3D", file: "stand-usana", w: 800, h: 600, hasLarge: false },
-  { id: "boyaca", title: "Stand Boyacá “Creemos”", category: "stand", kind: "Render 3D", file: "stand-boyaca", w: 1600, h: 864, hasLarge: true },
-  { id: "villa", title: "Stand Villa de Leiva 450 años", category: "stand", kind: "Render 3D", file: "stand-villa-de-leiva", w: 1280, h: 720, hasLarge: true },
-  { id: "aipa", title: "Stand Aipa", category: "stand", kind: "Render 3D", file: "stand-aipa", w: 1200, h: 900, hasLarge: false },
-  { id: "verde", title: "Stand Corpoboyacá", category: "stand", kind: "Render 3D", file: "stand-verde", w: 1536, h: 830, hasLarge: true },
-  { id: "fne-a", title: "Stand FNE de dos niveles", category: "stand", kind: "Render 3D", file: "stand-fne-a", w: 1280, h: 720, hasLarge: true },
-  { id: "banquete", title: "Montaje de evento corporativo", category: "evento", kind: "Fotografía", file: "evento-banquete", w: 1600, h: 1200, hasLarge: true },
+  { id: "tunja", title: "Proyecto de stand", category: "stand", kind: "Fotografía", internalName: "Stand de Tunja", file: "stand-tunja", w: 1600, h: 1200, hasLarge: true },
+  { id: "fne-b", title: "Proyecto de stand", category: "stand", kind: "Render 3D", internalName: "Stand Fedesmeraldas", file: "stand-fne-b", w: 1280, h: 720, hasLarge: true },
+  { id: "usana", title: "Proyecto de stand", category: "stand", kind: "Render 3D", internalName: "Stand USANA", file: "stand-usana", w: 800, h: 600, hasLarge: false },
+  { id: "boyaca", title: "Proyecto de stand", category: "stand", kind: "Render 3D", internalName: "Stand Boyacá “Creemos”", file: "stand-boyaca", w: 1600, h: 864, hasLarge: true },
+  { id: "villa", title: "Proyecto de stand", category: "stand", kind: "Render 3D", internalName: "Stand Villa de Leiva 450 años", file: "stand-villa-de-leiva", w: 1280, h: 720, hasLarge: true },
+  { id: "aipa", title: "Proyecto de stand", category: "stand", kind: "Render 3D", internalName: "Stand Aipa", file: "stand-aipa", w: 1200, h: 900, hasLarge: false },
+  { id: "verde", title: "Proyecto de stand", category: "stand", kind: "Render 3D", internalName: "Stand Corpoboyacá", file: "stand-verde", w: 1536, h: 830, hasLarge: true },
+  { id: "fne-a", title: "Proyecto de stand", category: "stand", kind: "Render 3D", internalName: "Stand FNE de dos niveles", file: "stand-fne-a", w: 1280, h: 720, hasLarge: true },
+  { id: "banquete", title: "Proyecto de evento", category: "evento", kind: "Fotografía", internalName: "Montaje de evento corporativo", file: "evento-banquete", w: 1600, h: 1200, hasLarge: true },
 ];
 
 export const TATTOO_POSTERS: Project[] = [
@@ -165,4 +168,10 @@ export const TATTOO_POSTERS: Project[] = [
 export function workSrc(p: Project, size: "sm" | "lg" = "sm") {
   const s = size === "lg" && p.hasLarge ? 1280 : 640;
   return `/work/${p.file}-${s}.webp`;
+}
+
+/** Texto alternativo neutral: describe lo visible y verificable, sin nombres de cliente inferidos. */
+export function projectAlt(p: Project): string {
+  if (p.kind === "Afiche") return `Afiche: ${p.title}`;
+  return `${p.kind} de ${p.category === "stand" ? "un stand de exhibición" : "un montaje de evento"}`;
 }
