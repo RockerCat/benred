@@ -49,7 +49,7 @@ export default function Home() {
 
       {/* HERO */}
       <section className="grid-paper relative overflow-hidden border-b border-[var(--line)]">
-        <div className="mx-auto grid max-w-[1400px] items-center gap-10 px-5 pb-14 pt-10 sm:px-8 lg:grid-cols-12 lg:gap-6 lg:pb-20 lg:pt-16">
+        <div className="mx-auto grid max-w-[1400px] items-center gap-10 px-5 pb-14 pt-6 sm:px-8 sm:pt-10 lg:grid-cols-12 lg:gap-6 lg:pb-20 lg:pt-16">
           <div className="lg:col-span-6">
             <h1 className="font-display text-[clamp(3rem,8.6vw,7.4rem)] font-bold leading-[0.92]">
               <span className="label mb-6 block !tracking-[0.12em] text-teal-deep">
@@ -92,7 +92,8 @@ export default function Home() {
               </div>
             </dl>
           </div>
-          <div className="lg:col-span-6">
+          {/* En móvil la animación va primero (order); en desktop conserva la columna derecha */}
+          <div className="max-lg:order-first lg:col-span-6">
             <BlueprintHero />
           </div>
         </div>

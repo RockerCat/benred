@@ -71,10 +71,20 @@ export function Header() {
     };
   }, [open]);
 
+  // El menú móvil se cierra al pasar a desktop o al cambiar de ruta, y al abrirse recibe el foco.
+  useEffect(() => {
+    if (!open) return;
+    const mq = window.matchMedia("(min-width: 768px)");
+    const onChange = () => mq.matches && setOpen(false);
+    mq.addEventListener("change", onChange);
+    document.querySelector<HTMLElement>("#menu-movil a")?.focus();
+    return () => mq.removeEventListener("change", onChange);
+  }, [open]);
+
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-paper/92 backdrop-blur">
+    <header className={`sticky top-0 z-50 border-b border-[var(--line)] backdrop-blur ${open ? "bg-paper" : "bg-paper/92"}`}>
       <div className="mx-auto flex h-[72px] max-w-[1400px] items-center justify-between px-5 sm:px-8">
         <Link href="/" aria-label="BenRed, inicio" className="flex items-center gap-2.5 sm:gap-3">
           <Image
@@ -145,7 +155,7 @@ export function Header() {
       {open && (
         <div
           id="menu-movil"
-          className="grid-paper fixed inset-x-0 bottom-0 top-[72px] z-50 flex flex-col justify-between bg-paper px-5 pb-8 pt-6 md:hidden"
+          className="grid-paper absolute inset-x-0 top-full z-50 flex h-[calc(100vh-73px)] h-[calc(100dvh-73px)] flex-col justify-between overflow-y-auto overscroll-contain bg-paper px-5 pb-8 pt-6 md:hidden"
         >
           <nav aria-label="Menú móvil" className="flex flex-col">
             {NAV.map((i, idx) => (
